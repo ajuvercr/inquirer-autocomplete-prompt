@@ -34,6 +34,7 @@ type AutocompleteConfig<Value> = AsyncPromptConfig &
     source: (input?: string) => Promise<ChoiceOrSeparatorArray<Value>>;
     validate?: (value: Value) => boolean | string | Promise<string | boolean>;
     transformer?: (value: string, { isFinal }: { isFinal: boolean }) => string;
+    onChange?: (value: Choice<Value> | null) => void;
     default?: string;
     emptyText?: string;
     pageSize?: number;
@@ -200,6 +201,9 @@ export default createPrompt(
 
           setCursorPosition(newCursorPosition);
           setChoice(firstChoice);
+          if (config.onChange) {
+            config.onChange(firstChoice);
+          }
           setSearchStatus(AsyncStatus.Done);
         })
         .catch((err) => {
@@ -271,6 +275,10 @@ export default createPrompt(
 
         setCursorPosition(newCursorPosition);
         setChoice(firstChoice);
+
+        if (config.onChange) {
+          config.onChange(firstChoice);
+        }
       } else {
         setIsDirty(true);
         setInput(rl.line);
